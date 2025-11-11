@@ -10,8 +10,8 @@ import type { MediaSource, ParallelNewsStateType } from "../types/state.js";
  * This node collects all research results, filters out nulls,
  * and creates a comprehensive aggregated summary.
  */
-export async function aggregateResults(state: ParallelNewsStateType) {
-	console.log("📊 Aggregating results from all media sources...");
+export async function aggregateResults( state: ParallelNewsStateType ) {
+	console.log( "📊 Aggregating results from all media sources..." );
 
 	try {
 		// Collect all media source results
@@ -28,12 +28,12 @@ export async function aggregateResults(state: ParallelNewsStateType) {
 			state.forbesResults,
 			state.bloombergResults,
 			state.economicTimesResults,
-		].filter((result): result is MediaSource => result !== null);
+		].filter( ( result ): result is MediaSource => result !== null );
 
-		console.log(`  📈 Aggregating ${allResults.length} sources`);
+		console.log( `  📈 Aggregating ${allResults.length} sources` );
 
-		if (allResults.length === 0) {
-			console.log("  ⚠️  No results to aggregate");
+		if ( allResults.length === 0 ) {
+			console.log( "  ⚠️  No results to aggregate" );
 			return {
 				aggregatedSummary: `No information found about "${state.topic}" from any media sources.`,
 				allSources: [],
@@ -42,37 +42,37 @@ export async function aggregateResults(state: ParallelNewsStateType) {
 		}
 
 		// Sort by relevance (highest first)
-		allResults.sort((a, b) => b.relevance - a.relevance);
+		allResults.sort( ( a, b ) => b.relevance - a.relevance );
 
-		// Prepare content for aggregation
+		// Prepare content for aggregation - OPTIMIZED: Only send summaries, not full content
 		const sourceSummaries = allResults
 			.map(
-				(source, idx) =>
-					`[${idx + 1}] ${source.name} (Relevance: ${source.relevance}/10)\nURL: ${source.url}\n${source.summary}\n`,
+				( source, idx ) =>
+					`[${idx + 1}] ${source.name} (Relevance: ${source.relevance}/10)\n${source.summary}`,
 			)
-			.join("\n---\n\n");
+			.join( "\n\n" );
 
-		// Generate aggregated summary
+		// Generate aggregated summary - OPTIMIZED: Concise prompt for faster processing
 		const parser = StructuredOutputParser.fromZodSchema(
 			AggregatedSummarySchema,
 		);
-		const prompt = ChatPromptTemplate.fromMessages([
+		const prompt = ChatPromptTemplate.fromMessages( [
 			[
 				"system",
-				"You are a senior news analyst. Aggregate and synthesize information from multiple media sources to create a comprehensive summary.",
+				"You are a senior news analyst. Quickly synthesize key information from multiple media sources. Be concise and focus on the most important findings.",
 			],
 			[
 				"human",
-				`Topic: {topic}\n\nTotal Sources: ${allResults.length}\n\nSource Summaries:\n{sourceSummaries}\n\n{format_instructions}`,
+				`Topic: {topic}\n\nSources (${allResults.length}):\n{sourceSummaries}\n\n{format_instructions}`,
 			],
-		]);
+		] );
 
-		const chain = prompt.pipe(llm).pipe(parser);
-		const result = await chain.invoke({
+		const chain = prompt.pipe( llm ).pipe( parser );
+		const result = await chain.invoke( {
 			topic: state.topic,
 			sourceSummaries,
 			format_instructions: parser.getFormatInstructions(),
-		});
+		} );
 
 		// Format final aggregated summary
 		const aggregatedSummary = `
@@ -82,7 +82,7 @@ export async function aggregateResults(state: ParallelNewsStateType) {
 ${result.summary}
 
 ## Key Findings
-${result.keyFindings.map((finding, idx) => `${idx + 1}. ${finding}`).join("\n")}
+${result.keyFindings.map( ( finding, idx ) => `${idx + 1}. ${finding}` ).join( "\n" )}
 
 ## Consensus Across Sources
 ${result.consensus}
@@ -94,13 +94,13 @@ ${result.differences}
 ${result.confidence.toUpperCase()}
 
 ## Sources Analyzed (${allResults.length} total)
-${allResults.map((source, idx) => `${idx + 1}. [${source.name}](${source.url}) - Relevance: ${source.relevance}/10`).join("\n")}
+${allResults.map( ( source, idx ) => `${idx + 1}. [${source.name}](${source.url}) - Relevance: ${source.relevance}/10` ).join( "\n" )}
 
 ---
 *Research completed across ${allResults.length} major media sources with ${result.confidence} confidence*
 `;
 
-		console.log(`✅ Aggregation complete with ${result.confidence} confidence`);
+		console.log( `✅ Aggregation complete with ${result.confidence} confidence` );
 
 		return {
 			aggregatedSummary,
@@ -108,8 +108,8 @@ ${allResults.map((source, idx) => `${idx + 1}. [${source.name}](${source.url}) -
 			keyFindings: result.keyFindings,
 			messages: [{ role: "assistant", content: aggregatedSummary }],
 		};
-	} catch (error) {
-		console.error("❌ Error aggregating results:", error);
+	} catch ( error ) {
+		console.error( "❌ Error aggregating results:", error );
 		return {
 			error: `Aggregation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
 			aggregatedSummary: "Failed to aggregate results",
