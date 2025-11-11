@@ -57,8 +57,6 @@ export async function researchNewsParallel(topic: string) {
 // Export main functions
 export { createParallelNewsGraph };
 
-// Export edges
-export * from "./edges/index.js";
 // Export nodes
 export * from "./nodes/index.js";
 
