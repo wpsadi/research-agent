@@ -1,0 +1,16 @@
+logLevel = "debug" # "debug" | "warn" | "error"
+
+telemetry = false
+
+[console]
+depth = 3
+
+
+[install]
+auto = "auto"
+registry = "https://registry.npmjs.org"
+
+
+[install.lockfile]
+save = true
+print = "yarn"

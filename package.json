@@ -1,0 +1,49 @@
+{
+	"name": "research-agent",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "bun run start",
+		"dev:wrangler": "wrangler dev",
+		"deploy": "wrangler deploy --minify",
+		"type:check": "bun run tsc --noEmit",
+		"check": "bun run biome check .",
+		"check:unsafe": "bun run biome check --write --unsafe .",
+		"check:write": "bun run biome check --write .",
+		"start": "bun src/server.ts"
+	},
+	"imports": {
+		"#/*": "./*",
+		"#src':/*": "./src/*",
+		"#controllers/*": "./src/controllers/*",
+		"#routes/*": "./src/routes/*",
+		"#middlewares/*": "./src/middlewares/*",
+		"#utils/*": "./src/utils/*",
+		"#configs/*": "./src/configs/*",
+		"#services/*": "./src/services/*",
+		"#types/*": "./src/types/*",
+		"#validators/*": "./src/validators/*"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.4",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@langchain/community": "^1.0.2",
+		"@langchain/core": "^1.0.4",
+		"@langchain/langgraph": "^1.0.1",
+		"@langchain/openai": "^1.1.0",
+		"@langchain/tavily": "^1.0.0",
+		"cheerio": "^1.1.2",
+		"deepagents": "^1.1.0",
+		"hono": "^4.10.4",
+		"html-to-text": "^9.0.5",
+		"ioredis": "^5.8.2",
+		"langchain": "^1.0.4",
+		"zod": "^4.1.12"
+	}
+}
