@@ -1,4 +1,4 @@
-# openai-agent-builder
+# research-agent
 
 To install dependencies:
 
